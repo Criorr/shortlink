@@ -1,4 +1,4 @@
-package com.zk.shortlink.admin.dto;
+package com.zk.shortlink.admin.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.zk.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;

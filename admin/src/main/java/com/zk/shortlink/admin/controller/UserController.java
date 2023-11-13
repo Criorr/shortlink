@@ -1,6 +1,7 @@
 package com.zk.shortlink.admin.controller;
 
 import com.zk.shortlink.admin.common.convention.result.Result;
+import com.zk.shortlink.admin.common.convention.result.Results;
 import com.zk.shortlink.admin.dto.UserRespDTO;
 import com.zk.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,6 @@ public class UserController {
      */
     @GetMapping("/api/short-link/admin/v1/user/{username}")
     public Result<UserRespDTO> getUserByUsername(@PathVariable("username") String username) {
-        UserRespDTO result = userService.getUserByUsername(username);
-        return new Result<UserRespDTO>().setCode("0").setData(result);
+        return Results.success(userService.getUserByUsername(username));
     }
 }

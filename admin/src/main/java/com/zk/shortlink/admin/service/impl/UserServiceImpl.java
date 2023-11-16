@@ -2,6 +2,7 @@ package com.zk.shortlink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zk.shortlink.admin.common.convention.exception.ClientException;
@@ -9,6 +10,7 @@ import com.zk.shortlink.admin.common.enums.UserErrorCodeEnum;
 import com.zk.shortlink.admin.dao.entity.UserDO;
 import com.zk.shortlink.admin.dao.mapper.UserMapper;
 import com.zk.shortlink.admin.dto.request.UserRegisterReqDTO;
+import com.zk.shortlink.admin.dto.request.UserUpdateReqDTO;
 import com.zk.shortlink.admin.dto.response.UserRespDTO;
 import com.zk.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -68,5 +70,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public void update(UserUpdateReqDTO requestParams) {
+        //TODO 验证当前用户名是否为登录用户   防止通过自己的TOKEN恶意串改他人信息
+        LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
+                .eq(UserDO::getUsername, requestParams.getUsername());
+        baseMapper.update(BeanUtil.toBean(requestParams, UserDO.class),updateWrapper);
     }
 }

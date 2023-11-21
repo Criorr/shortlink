@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zk.shortlink.admin.common.biz.user.UserContext;
 import com.zk.shortlink.admin.dao.entity.GroupDO;
 import com.zk.shortlink.admin.dao.mapper.GroupMapper;
+import com.zk.shortlink.admin.dto.request.ShortLinkGroupSortReqDTO;
 import com.zk.shortlink.admin.dto.request.ShortLinkGroupUpdateReqDTO;
 import com.zk.shortlink.admin.dto.response.ShortLinkGroupRespDTO;
 import com.zk.shortlink.admin.service.GroupService;
@@ -68,6 +69,20 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         GroupDO groupDO = new GroupDO();
         groupDO.setDelFlag(1);
         baseMapper.update(groupDO, queryWrapper);
+    }
+
+    @Override
+    public void sortGroup(List<ShortLinkGroupSortReqDTO> requestParam) {
+        requestParam.forEach(each -> {
+            GroupDO groupDO = GroupDO.builder()
+                    .sortOrder(each.getSortOrder())
+                    .build();
+            LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
+                    .eq(GroupDO::getUsername, UserContext.getUsername())
+                    .eq(GroupDO::getDelFlag, 0)
+                    .eq(GroupDO::getGid, each.getGid());
+            baseMapper.update(groupDO, queryWrapper);
+        });
     }
 
     private boolean hasGid(String gid) {

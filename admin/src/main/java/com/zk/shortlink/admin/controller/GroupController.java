@@ -3,6 +3,7 @@ package com.zk.shortlink.admin.controller;
 import com.zk.shortlink.admin.common.convention.result.Result;
 import com.zk.shortlink.admin.common.convention.result.Results;
 import com.zk.shortlink.admin.dto.request.ShortLinkGroupReqDTO;
+import com.zk.shortlink.admin.dto.request.ShortLinkGroupSortReqDTO;
 import com.zk.shortlink.admin.dto.request.ShortLinkGroupUpdateReqDTO;
 import com.zk.shortlink.admin.dto.response.ShortLinkGroupRespDTO;
 import com.zk.shortlink.admin.service.GroupService;
@@ -52,6 +53,15 @@ public class GroupController {
     @DeleteMapping ("/api/short-link/v1/group")
     public Result<Void> updateGroup(@RequestParam("gid") String gid) {
         groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+    /**
+     * 短链接分组排序
+     */
+    @PostMapping("/api/short-link/v1/group/sort")
+    public Result<Void> sortGroup(@RequestBody List<ShortLinkGroupSortReqDTO> requestParam) {
+        groupService.sortGroup(requestParam);
         return Results.success();
     }
 }

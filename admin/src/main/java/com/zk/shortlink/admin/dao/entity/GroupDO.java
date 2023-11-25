@@ -1,7 +1,7 @@
 package com.zk.shortlink.admin.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zk.shortlink.admin.database.BaseDO;
+import com.zk.shortlink.admin.common.database.BaseDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

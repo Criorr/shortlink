@@ -50,6 +50,11 @@ public class ShortLinkDO extends BaseDO {
     private Integer clickNum;
 
     /**
+     * 网站图标
+     */
+    private String favicon;
+
+    /**
      * 分组标识
      */
     private String gid;

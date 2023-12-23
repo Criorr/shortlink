@@ -24,7 +24,7 @@ public class GroupController {
     /**
      *  新增短链接分组
      */
-    @PostMapping("/api/short-link/admin/admin/v1/group")
+    @PostMapping("/api/short-link/admin/v1/group")
     public Result<Void> saveGroup(@RequestBody ShortLinkGroupReqDTO requestParam) {
         groupService.saveGroup(requestParam.getName());
         return Results.success();

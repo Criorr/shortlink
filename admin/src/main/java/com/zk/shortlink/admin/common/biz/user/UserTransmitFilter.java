@@ -27,8 +27,8 @@ public class UserTransmitFilter implements Filter {
     private final StringRedisTemplate stringRedisTemplate;
 
     private static final List<String> IGNORE_URI = Lists.newArrayList(
-            "/api/short-link/v1/user/has-username",
-            "/api/short-link/v1/user/login"
+            "/api/short-link/v1/admin/user/has-username",
+            "/api/short-link/admin/v1/user/login"
     );
 
     @Override
@@ -40,7 +40,7 @@ public class UserTransmitFilter implements Filter {
         if (!IGNORE_URI.contains(requestURI)) {
             String method = httpServletRequest.getMethod();
             // 排除注册
-            if (!(Objects.equals(requestURI, "/api/short-link/v1/user") && Objects.equals(method, "POST"))) {
+            if (!(Objects.equals(requestURI, "/api/short-link/admin/v1/user") && Objects.equals(method, "POST"))) {
                 String username = httpServletRequest.getHeader("username");
                 String token = httpServletRequest.getHeader("token");
                 if (!StrUtil.isAllNotBlank(token, username)) {

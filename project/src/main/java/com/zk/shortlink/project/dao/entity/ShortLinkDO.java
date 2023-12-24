@@ -60,7 +60,7 @@ public class ShortLinkDO extends BaseDO {
     private String gid;
 
     /**
-     * 启用标识 0：未启用 1：已启用
+     * 启用标识 0：已启用 1：未启用
      */
     private Integer enableStatus;
 

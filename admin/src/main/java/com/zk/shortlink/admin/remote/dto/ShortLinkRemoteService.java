@@ -8,9 +8,11 @@ import com.zk.shortlink.admin.common.convention.result.Result;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
+import com.zk.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public interface ShortLinkRemoteService {
@@ -35,6 +37,19 @@ public interface ShortLinkRemoteService {
         paramMap.put("current", requestParam.getCurrent());
         paramMap.put("size", requestParam.getSize());
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/page", paramMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 查询短链接分组内数量
+     * @param requestParam 短链接分组内数量请求参数
+     * @return 短链接分组内数量列表
+     */
+    default Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(List<String> requestParam) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("requestParam", requestParam);
+        String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/count", paramMap);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
     }

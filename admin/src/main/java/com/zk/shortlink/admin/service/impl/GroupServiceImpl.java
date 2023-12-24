@@ -38,6 +38,11 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public void saveGroup(String groupName) {
+        saveGroup(UserContext.getUsername(), groupName);
+    }
+
+    @Override
+    public void saveGroup(String username, String groupName) {
         String gid;
         do {
             gid = RandomIdGenerator.generateRandomId();
@@ -46,7 +51,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .gid(gid)
                 .sortOrder(0)
                 .name(groupName)
-                .username(UserContext.getUsername())
+                .username(username)
                 .build();
         baseMapper.insert(groupDO);
     }

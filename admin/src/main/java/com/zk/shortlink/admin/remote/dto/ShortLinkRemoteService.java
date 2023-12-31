@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zk.shortlink.admin.common.convention.result.Result;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.zk.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -50,6 +51,17 @@ public interface ShortLinkRemoteService {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("requestParam", requestParam);
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/count", paramMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+
+    /**
+     * 修改短链接
+     * @param requestParam 短链接修改请求参数
+     */
+    default Result<Void> updateShortLink(ShortLinkUpdateReqDTO requestParam) {
+        String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update", JSON.toJSONString(requestParam));
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
     }

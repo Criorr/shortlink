@@ -12,6 +12,8 @@ import com.zk.shortlink.project.common.convention.exception.ClientException;
 import com.zk.shortlink.project.common.convention.exception.ServiceException;
 import com.zk.shortlink.project.common.enums.ValidDateTypeEnum;
 import com.zk.shortlink.project.dao.entity.ShortLinkDO;
+import com.zk.shortlink.project.dao.entity.ShortLinkGotoDO;
+import com.zk.shortlink.project.dao.mapper.ShortLinkGotoMapper;
 import com.zk.shortlink.project.dao.mapper.ShortLinkMapper;
 import com.zk.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.zk.shortlink.project.dto.req.ShortLinkPageReqDTO;
@@ -21,7 +23,10 @@ import com.zk.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.zk.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.zk.shortlink.project.service.ShortLinkService;
 import com.zk.shortlink.project.toolkit.HashUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
 import org.springframework.dao.DuplicateKeyException;
@@ -40,8 +45,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
     final RBloomFilter<String> shortLinkCreateCachePenetrationBloomFilter;
+    final ShortLinkGotoMapper shortLinkGotoMapper;
 
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
         String shortLinkSuffix = generateSuffix(requestParam);
@@ -61,8 +67,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .shortUri(shortLinkSuffix)
                 .enableStatus(0)
                 .build();
+        ShortLinkGotoDO shortLinkGotoDO = ShortLinkGotoDO.builder()
+                .gid(requestParam.getGid())
+                .fullShortUrl(fullShortUrl)
+                .build();
         try {
             baseMapper.insert(shortLinkDO);
+            shortLinkGotoMapper.insert(shortLinkGotoDO);
+
             /**
              * 布隆过滤器在并发操作下可能出现多个线程对同一个元素进行判断（因为是先判断，在添加进布隆过滤器，中间会有时间间隔）
              *  布隆过滤器误判元素
@@ -79,7 +91,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         }
         shortLinkCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
-                .fullShortUrl(shortLinkDO.getFullShortUrl())
+                .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())
                 .gid(requestParam.getGid())
                 .originUrl(requestParam.getOriginUrl())
                 .build();
@@ -150,6 +162,27 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             baseMapper.insert(shortLinkDO);
         }
 
+    }
+
+    @SneakyThrows
+    @Override
+    public void ShortLinkRedirect(String shortUrl, HttpServletRequest request, HttpServletResponse response) {
+        String serverName = request.getServerName();
+        String fullShortUrl = serverName + "/" + shortUrl;
+        LambdaQueryWrapper<ShortLinkGotoDO> shortLinkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+                .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
+        ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(shortLinkGotoQueryWrapper);
+        if (shortLinkGotoDO == null) {
+            //严谨来说此处要进行封控
+            return;
+        }
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, shortLinkGotoDO.getGid())
+                .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
+        ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
+        if (shortLinkDO != null) {
+            response.sendRedirect(shortLinkDO.getOriginUrl());
+        }
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {

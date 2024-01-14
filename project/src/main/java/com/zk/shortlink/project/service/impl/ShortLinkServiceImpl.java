@@ -101,7 +101,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         }
         shortLinkCreateCachePenetrationBloomFilter.add(fullShortUrl);
         stringRedisTemplate.opsForValue().set(
-                String.format(LOCK_GOTO_SHORT_LINK_KEY, shortLinkDO.getFullShortUrl()),
+                String.format(GOTO_SHORT_LINK_KEY, shortLinkDO.getFullShortUrl()),
                 requestParam.getOriginUrl(),
                 LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()), TimeUnit.MILLISECONDS
         );
@@ -199,7 +199,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             return;
         }
         String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_IS_NULL_LINK_KEY, fullShortUrl));
-        if (StrUtil.isBlank(gotoIsNullShortLink)) {
+        // 缓存穿透的数据在Redis中存储"-" 不为空说明是穿透的值 直接返回
+        if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
             return;
         }
         // 如果短链接缓存失效 进行加锁查库设置缓存
@@ -217,7 +218,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
             ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(shortLinkGotoQueryWrapper);
             if (shortLinkGotoDO == null) {
-                stringRedisTemplate.opsForValue().set(String.format(GOTO_SHORT_IS_NULL_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.SECONDS);
+                stringRedisTemplate.opsForValue().set(String.format(GOTO_SHORT_IS_NULL_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
                 return;
             }
             LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)

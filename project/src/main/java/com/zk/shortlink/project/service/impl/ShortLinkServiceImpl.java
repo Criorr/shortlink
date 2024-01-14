@@ -24,6 +24,7 @@ import com.zk.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.zk.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.zk.shortlink.project.service.ShortLinkService;
 import com.zk.shortlink.project.toolkit.HashUtil;
+import com.zk.shortlink.project.toolkit.LinkUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -99,6 +100,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             }
         }
         shortLinkCreateCachePenetrationBloomFilter.add(fullShortUrl);
+        stringRedisTemplate.opsForValue().set(
+                String.format(LOCK_GOTO_SHORT_LINK_KEY, shortLinkDO.getFullShortUrl()),
+                requestParam.getOriginUrl(),
+                LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()), TimeUnit.MILLISECONDS
+        );
         return ShortLinkCreateRespDTO.builder()
                 .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())
                 .gid(requestParam.getGid())

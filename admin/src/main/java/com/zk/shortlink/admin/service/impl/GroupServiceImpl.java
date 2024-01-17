@@ -11,7 +11,7 @@ import com.zk.shortlink.admin.dao.mapper.GroupMapper;
 import com.zk.shortlink.admin.dto.request.ShortLinkGroupSortReqDTO;
 import com.zk.shortlink.admin.dto.request.ShortLinkGroupUpdateReqDTO;
 import com.zk.shortlink.admin.dto.response.ShortLinkGroupRespDTO;
-import com.zk.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.zk.shortlink.admin.remote.ShortLinkRemoteService;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.zk.shortlink.admin.service.GroupService;
 import com.zk.shortlink.admin.toolkit.RandomIdGenerator;

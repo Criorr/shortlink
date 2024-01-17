@@ -2,7 +2,7 @@ package com.zk.shortlink.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zk.shortlink.admin.common.convention.result.Result;
-import com.zk.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.zk.shortlink.admin.remote.ShortLinkRemoteService;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.zk.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;

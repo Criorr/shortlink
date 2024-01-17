@@ -1,4 +1,4 @@
-package com.zk.shortlink.admin.remote.dto;
+package com.zk.shortlink.admin.remote;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
@@ -62,6 +62,17 @@ public interface ShortLinkRemoteService {
      */
     default Result<Void> updateShortLink(ShortLinkUpdateReqDTO requestParam) {
         String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update", JSON.toJSONString(requestParam));
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 根据url获取title
+     * @param requestParam url链接
+     * @return title
+     */
+    default Result<String> getTitleByUrl(String requestParam) {
+        String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/urlTitle?url=" + requestParam);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
     }

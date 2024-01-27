@@ -5,9 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zk.shortlink.admin.common.convention.result.Result;
-import com.zk.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
-import com.zk.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
-import com.zk.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import com.zk.shortlink.admin.remote.dto.req.*;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.zk.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -73,6 +71,49 @@ public interface ShortLinkRemoteService {
      */
     default Result<String> getTitleByUrl(String requestParam) {
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/urlTitle?url=" + requestParam);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+
+    /**
+     * 保存回收站
+     * @param requestParam 保存回收站请求实体
+     * @return
+     */
+    default Result<Void> saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
+        String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/save", JSON.toJSONString(requestParam));
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 分页查询回收站短链接
+     */
+    default Result<IPage<ShortLinkPageRespDTO>> recycleBinPageShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
+        HashMap<String, Object> paramMap = new HashMap<>();
+        paramMap.put("gidList", requestParam.getGidList());
+        paramMap.put("current", requestParam.getCurrent());
+        paramMap.put("size", requestParam.getSize());
+        String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/page", paramMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 恢复短链接
+     */
+    default Result<Void> recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
+        String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 移除短链接
+     */
+    default Result<Void> removeRecycleBin(RecycleBinRemoveReqDTO requestParam) {
+        String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
     }

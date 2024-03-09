@@ -19,14 +19,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zk.shortlink.project.common.convention.exception.ClientException;
 import com.zk.shortlink.project.common.convention.exception.ServiceException;
 import com.zk.shortlink.project.common.enums.ValidDateTypeEnum;
-import com.zk.shortlink.project.dao.entity.LinkAccessStatsDO;
-import com.zk.shortlink.project.dao.entity.LinkLocaleStatsDO;
-import com.zk.shortlink.project.dao.entity.ShortLinkDO;
-import com.zk.shortlink.project.dao.entity.ShortLinkGotoDO;
-import com.zk.shortlink.project.dao.mapper.LinkAccessStatsMapper;
-import com.zk.shortlink.project.dao.mapper.LinkLocalStatsMapper;
-import com.zk.shortlink.project.dao.mapper.ShortLinkGotoMapper;
-import com.zk.shortlink.project.dao.mapper.ShortLinkMapper;
+import com.zk.shortlink.project.dao.entity.*;
+import com.zk.shortlink.project.dao.mapper.*;
 import com.zk.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.zk.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.zk.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -79,6 +73,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     final LinkLocalStatsMapper linkLocalStatsMapper;
     @Value("${short-link.locale.amap-key}")
     private String statsLocaleAmapKey;
+    final LinkOsStatsMapper linkOsStatsMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -348,6 +343,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .country("中国")
                         .build();
                 linkLocalStatsMapper.shortLinkLocaleStates(linkLocaleStatsDO);
+                LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
+                        .os(LinkUtil.getOs(request))
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .gid(gid)
+                        .cnt(1)
+                        .build();
+                linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
             }
         } catch (Throwable ex) {
             log.error("短链接访问量统计异常", ex);

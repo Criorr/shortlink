@@ -33,6 +33,9 @@ rules:
           standard:
             shardingColumn: gid
             shardingAlgorithmName: link_stats_today_table_hash_mod
+    # 两个分表并分片键相同 需要进行绑定
+    bindingTables:
+      - t_link, t_link_stats_today
     # 分片算法
     shardingAlgorithms:
       # 数据表分片算法
